@@ -5,41 +5,52 @@ import java.util.ArrayList;
 public class Problem01 {
     static class Solution {
         public int[] solution(int[] progresses, int[] speeds) {
-            int[] answer = {};
 
             int nCompleted = 0;
             ArrayList<Integer> completed = new ArrayList<>();
-
-            int cnt = 0;
             while(nCompleted < progresses.length) {
-                System.out.println(nCompleted + " " + progresses.length);
-                System.out.println(cnt++ + ": " + print(progresses));
-
                 for(int i=nCompleted; i<progresses.length; i++) {
                     progresses[i] += speeds[i];
                 }
 
-                boolean completeExist = false;
+                boolean isFirstProcessComplete = false;
+                for(int i=nCompleted; i<progresses.length; i++) {
+                    if(isFirstProcessComplete){
+                        if(isComplete(progresses, i)){
+                            if(i == progresses.length - 1) {
+                                completed.add(i - nCompleted + 1);
+                                nCompleted = progresses.length;
+                                break;
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            completed.add(i - nCompleted);
+                            nCompleted = i;
+                            break;
+                        }
+                    } else {
+                        if(isComplete(progresses, nCompleted)) {
+                            if(i == progresses.length - 1) {
+                                completed.add(i - nCompleted + 1);
+                                nCompleted = progresses.length;
+                                break;
+                            } else {
+                                isFirstProcessComplete = true;
+                                continue;
+                            }
 
-                for(int i=nCompleted; i<=progresses.length; i++) {
-                    if(i==progresses.length) {
-                        completed.add(progresses.length - nCompleted);
-                        nCompleted = progresses.length;
-                        break;
-                    }
-                    if(isComplete(progresses, i)) {
-                        completeExist = true;
-                        continue;
-                    } else if(completeExist){
-                        nCompleted = i;
-                        completed.add(nCompleted);
-                        break;
+                        }
                     }
                 }
-
             }
 
-            System.out.println("end");
+            int[] answer = new int[completed.size()];
+            int idx = 0;
+            for(int i : completed) {
+                answer[idx++] = i;
+            }
+
             return answer;
         }
 
@@ -47,8 +58,8 @@ public class Problem01 {
             return (progresses[idx] >= 100)? true : false;
         }
 
-        private String print(int[] progresses) {
-            String s = null;
+        private String toString(int[] progresses) {
+            String s = "";
             for(int i=0; i<progresses.length; i++) {
                 s = s + progresses[i] + ", ";
             }
