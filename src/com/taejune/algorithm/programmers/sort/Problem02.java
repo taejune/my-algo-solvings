@@ -1,72 +1,136 @@
 package com.taejune.algorithm.programmers.sort;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 // https://programmers.co.kr/learn/courses/30/lessons/42746
 public class Problem02 {
 
-    public static void main(String[] args) {
-        Solution solution = new Solution();
+    /*
+    case01: [79, 76, 7, 98, 89, 0, 309, 88]
 
-        String case01 = solution.solution(new int[]{1, 2, 3});
-        assert case01.equals("12");
+    9 -> 98
+    8 -> 89, 88
+    7 -> 79, 7, 76
+    6 ->
+    5 ->
+    4 ->
+    3 -> 309
+    2 ->
+    1 ->
+    0 ->
+     */
+    public static class Solution {
+
+        class OrderNode {
+            private OrderNode[] children;
+            private boolean isLeaf;
+            private boolean hasChild;
+            private int v;
+
+            public OrderNode(int value) {
+                v = value;
+                hasChild = false;
+                isLeaf = false;
+                children = new OrderNode[10];
+            }
+
+            public int getValue() {
+                return v;
+            }
+
+            public OrderNode push(int value) {
+                this.hasChild = true;
+                if (children[value] == null) {
+                    children[value] = new OrderNode(value);
+                    return children[value];
+                }
+                return children[value];
+            }
+
+            public OrderNode setLeaf() {
+                isLeaf = true;
+                return this;
+            }
+
+            private OrderNode getBiggestChild() {
+                for (int i = 9; i >= 0; i--) {
+                    if (children[i] == null) continue;
+                    return children[i];
+                }
+                System.out.println("[WARN] Try to get child even though not hasn't");
+                return null;
+            }
+
+            public String popBiggestChildNodeValue() {
+                String s = "";
+                if (!hasChild && !isLeaf) {
+                    System.out.println("[WARN]: it's not leaf but has no child");
+                    return s;
+                } else if (!hasChild && isLeaf) {
+                    isLeaf = false;
+                    return s + v;
+                }
+
+                OrderNode child = this.getBiggestChild();
+                if (isLeaf) {
+                    if (v > child.getValue()) {
+                        isLeaf = false;
+                        return s + v;
+                    } else if (v == child.getValue()) {
+                        if(v >= child.getBiggestChild().getValue()) {
+                            isLeaf = false;
+                            return s + v;
+                        } else {
+                            return s + v + child.popBiggestChildNodeValue();
+                        }
+                    }
+                    // if v < child.getValue(), it can handle case.
+                }
+                return s + v + child.popBiggestChildNodeValue();
+            }
+        }
+
+        public String solution(int[] numbers) {
+            OrderNode root = new OrderNode(-1);
+            for (int e : numbers) {
+                OrderNode cur = root;
+                ArrayList<Integer> orders = getOrderNumberList(Integer.toString(e));
+                System.out.println("push " + orders.toString());
+                for (int n : orders) {
+                    cur = cur.push(n);
+                }
+                cur.setLeaf();
+            }
+
+            String answer = "";
+            System.out.println("answer: " + root.popBiggestChildNodeValue());
+            System.out.println("answer: " + root.popBiggestChildNodeValue());
+            System.out.println("answer: " + root.popBiggestChildNodeValue());
+            System.out.println("answer: " + root.popBiggestChildNodeValue());
+            return answer;
+        }
+
+
+        private ArrayList<Integer> getOrderNumberList(String number) {
+            ArrayList<Integer> l = new ArrayList<>(number.length());
+            for (int i = 0; i < number.length(); i++) {
+                l.add(Character.getNumericValue(number.charAt(i)));
+            }
+            return l;
+        }
+    }
+
+    public static void main(String[] args) {
+        String case01 = new Solution().solution(new int[]{1, 2, 3});
+        assert case01.equals("321");
         System.out.println(case01);
 
-        String case02 = solution.solution(new int[]{6, 10, 2});
+        String case02 = new Solution().solution(new int[]{6, 10, 2});
         assert case02.equals("6210");
         System.out.println(case02);
 
-        String case03 = solution.solution(new int[]{3, 30, 34, 5, 9});
+        String case03 = new Solution().solution(new int[]{3, 30, 34, 5, 9});
         assert case03.equals("9534330");
         System.out.println(case03);
-//        9, 90, 95, 7
-//        9799590
-
-    }
-
-    static class Solution {
-        public String solution(int[] numbers) {
-            String answer = "";
-
-            int max = 0 ;
-            ArrayList<Integer> list = (ArrayList<Integer>) Arrays.stream(numbers).boxed().collect(Collectors.toList());
-            for (List<Integer> comb : combinationList(list)) {
-                int n = joinedNumber(comb.stream().mapToInt(i -> i).toArray());
-                if(max < n) {
-                    max = n;
-                }
-            }
-
-            return String.valueOf(max);
-        }
-
-        private List<List<Integer>> combinationList(List<Integer> candinate) {
-            List<List<Integer>> ret = new ArrayList<>();
-            if (candinate.size() == 1) {
-                ret.add(candinate);
-            } else {
-                for (int i = 0; i < candinate.size(); i++) {
-                    List<Integer> copy = new ArrayList<>(candinate);
-                    int removed = copy.remove(i);
-                    List<List<Integer>> subcombinationList = combinationList(copy);
-                    for (List<Integer> subcombination : subcombinationList) {
-                        subcombination.add(0, removed);
-                        ret.add(subcombination);
-                    }
-                }
-            }
-            return ret;
-        }
-
-        private int joinedNumber(int[] numbers) {
-            StringBuilder sb = new StringBuilder();
-            for (int n : numbers) {
-                sb.append(n);
-            }
-            return Integer.parseInt(sb.toString());
-        }
     }
 }
