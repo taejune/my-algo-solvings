@@ -3,13 +3,11 @@ package com.taejune.algorithm.programmers.greedy;
 import java.util.*;
 
 public class Problem01 {
-
     static class Solution {
         public int solution(int n, int[] lost, int[] reserve) {
-            System.out.println("Start ------");
-            List<Integer> rest = new ArrayList<>();
+            Map<Integer, Boolean> rest = new HashMap<>();
             for (int r : reserve) {
-                rest.add(r);
+                rest.put(r, true);
             }
 
             Map<Integer, Boolean> notAfford = new HashMap<>();
@@ -18,48 +16,74 @@ public class Problem01 {
             }
 
             // 1. 여벌을 가져온 사람이 도난 경우
-            for (int i = 0; i < rest.size(); i++) {
-                if (notAfford.getOrDefault(rest.get(i), false)) {
-                    notAfford.remove(rest.get(i));
-                    rest.remove(i);
+            List<Integer> rearranged = new ArrayList<>();
+            for (int key : rest.keySet()) {
+                if (notAfford.getOrDefault(key, false)) {
+                    rearranged.add(key);
                 }
             }
+
+            for(int key : rearranged) {
+                notAfford.remove(key);
+                rest.remove(key);
+            }
+
+//            System.out.println("==== REMOVE SELF LOST BY RESERVED =====");
+//            System.out.println("rest: " + rest.keySet().toString());
+//            System.out.println("not afforables: " + notAfford.keySet().toString());
 
             // 2. 여벌을 가져왔는데 한 쪽만 안 가져온 경우
             boolean doesReArranged;
             do {
                 doesReArranged = false;
-                for (int i = 0; i < rest.size(); i++) {
-                    int r = rest.get(i);
-                    if ((notAfford.getOrDefault(r - 1, false) && !notAfford.getOrDefault(r + 1, false))) {
-                        System.out.println("only before " + r + " is not afforable");
-                        notAfford.remove(r - 1);
-                        rest.remove(i);
+                List<Integer> rearrangedReserved = new ArrayList<>();
+                List<Integer> filledNotAfford = new ArrayList<>();
+                for (int key : rest.keySet()) {
+                    if ((notAfford.getOrDefault(key - 1, false) && !notAfford.getOrDefault(key + 1, false))) {
+//                        System.out.println("only before " + key + " is not afforable");
+                        rearrangedReserved.add(key);
+                        filledNotAfford.add(key - 1);
                         doesReArranged = true;
-                    } else if (!notAfford.getOrDefault(r - 1, false) && notAfford.getOrDefault(r + 1, false)) {
-                        System.out.println("only after " + r + " is not afforable");
-                        notAfford.remove(r + 1);
-                        rest.remove(i);
+                    } else if (!notAfford.getOrDefault(key - 1, false) && notAfford.getOrDefault(key + 1, false)) {
+//                        System.out.println("only after " + key + " is not afforable");
+                        rearrangedReserved.add(key);
+                        filledNotAfford.add(key + 1);
                         doesReArranged = true;
                     } else {
-                        System.out.println("both " + r + " is not afforable");
+//                        System.out.println("both " + key + " is not afforable");
                     }
                 }
+
+                for (int r : rearrangedReserved) {
+                    rest.remove(r);
+                }
+                for (int r : filledNotAfford) {
+                    notAfford.remove(r);
+                }
+
             } while (doesReArranged);
 
-            for (int i = 0; i < rest.size(); i++) {
-                int r = rest.get(i);
-                if (notAfford.getOrDefault(r - 1, false)) {
-                    notAfford.remove(r - 1);
-                    rest.remove(i);
-                } else if (notAfford.getOrDefault(r + 1, false)) {
-                    notAfford.remove(r + 1);
-                    rest.remove(i);
+            List<Integer> rearrangedReserved = new ArrayList<>();
+            List<Integer> filledNotAfford = new ArrayList<>();
+            for (int key : rest.keySet()) {
+                if (notAfford.getOrDefault(key - 1, false)) {
+                    rearrangedReserved.add(key);
+                    filledNotAfford.add(key - 1);
+                } else if (notAfford.getOrDefault(key + 1, false)) {
+                    rearrangedReserved.add(key);
+                    filledNotAfford.add(key + 1);
                 }
             }
+            for (int r : rearrangedReserved) {
+                rest.remove(r);
+            }
+            for (int r : filledNotAfford) {
+                notAfford.remove(r);
+            }
 
-            System.out.println("rest: " + rest.toString());
-            System.out.println("not afforables: " + notAfford.toString());
+//            System.out.println("==== FINAL =====");
+//            System.out.println("rest: " + rest.keySet().toString());
+//            System.out.println("not afforables: " + notAfford.keySet().toString());
             return n - notAfford.size();
         }
     }
@@ -87,6 +111,6 @@ public class Problem01 {
 
         int case06 = new Solution().solution(9, new int[]{1, 2, 3, 4}, new int[]{1});
         System.out.println(case06);
-        assert case06 == 2;
+        assert case06 == 6;
     }
 }
