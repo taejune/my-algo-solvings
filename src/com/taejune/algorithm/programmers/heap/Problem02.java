@@ -4,9 +4,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class Problem02 {
-
     static class Solution {
-
         class Job implements Comparable<Job> {
             int startTime, duration;
 
@@ -18,7 +16,6 @@ public class Problem02 {
             public int getStartTime() {
                 return startTime;
             }
-
             public int getDuration() {
                 return duration;
             }
@@ -56,15 +53,17 @@ public class Problem02 {
                 Job current;
                 if (queuedJobs.isEmpty()) {
                     current = allJobs.poll();
+                    currentTime = current.getStartTime();
                 } else {
                     current = queuedJobs.poll();
                 }
 
-                System.out.println(current);
-
                 while (!allJobs.isEmpty() && (allJobs.peek().getStartTime() <= (currentTime + current.getDuration()))) {
                     queuedJobs.offer(allJobs.poll());
                 }
+
+//                System.out.println(current);
+//                System.out.printf("current(%d) + duration(%d) - startTime (%d)\n", currentTime, current.getDuration(), current.getStartTime());
 
                 answer += (currentTime + current.getDuration() - current.getStartTime());
                 currentTime += current.getDuration();
@@ -82,5 +81,14 @@ public class Problem02 {
         int case01 = new Solution().solution(new int[][]{{0, 3}, {1, 9}, {2, 6}});
         assert case01 == 9;
         System.out.println(case01);
+
+        int case02 = new Solution().solution(new int[][]{{0, 3}});
+        assert case02 == 3;
+        System.out.println(case02);
+
+        int case03 = new Solution().solution(new int[][]{{0, 5}, {6, 5}});
+        assert case03 == 5;
+        System.out.println(case03);
+
     }
 }
