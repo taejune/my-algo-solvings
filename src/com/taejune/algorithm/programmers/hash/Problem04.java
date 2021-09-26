@@ -108,7 +108,10 @@ public class Problem04 {
                 }
 
                 bestAlbum.add(orderedRecordQueue.poll().getId());
-                bestAlbum.add(orderedRecordQueue.poll().getId());
+                Record second = orderedRecordQueue.poll();
+                if(second != null) {
+                    bestAlbum.add(second.getId());
+                }
             }
 
             int[] answer = new int[bestAlbum.size()];
