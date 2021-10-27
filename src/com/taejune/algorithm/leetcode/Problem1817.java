@@ -6,17 +6,17 @@ import java.util.*;
 public class Problem1817 {
     public static class Solution {
         public int[] solution(int[][] logs, int k) {
-            Map<Integer, Set<Integer>> m = new HashMap<>();
+            Map<Integer, Set<Integer>> userActiveMinutes = new HashMap<>();
             for (int i = 0; i < logs.length; i++) {
-                Set s = m.getOrDefault(logs[i][0], new HashSet<>());
-                s.add(logs[i][1]);
-                m.put(logs[i][0], s);
+                Set activeMinutes = userActiveMinutes.getOrDefault(logs[i][0], new HashSet<>());
+                activeMinutes.add(logs[i][1]);
+                userActiveMinutes.put(logs[i][0], activeMinutes);
             }
             int[] answer = new int[k];
-            for (int id : m.keySet()) {
-                Set s = m.get(id);
-                if (s != null) {
-                    answer[s.size()-1]++;
+            for (int userID : userActiveMinutes.keySet()) {
+                Set activeMinutes = userActiveMinutes.get(userID);
+                if (activeMinutes != null) {
+                    answer[activeMinutes.size()-1]++;
                 }
             }
             return answer;
