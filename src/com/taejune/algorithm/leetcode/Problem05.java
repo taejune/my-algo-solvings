@@ -6,6 +6,7 @@ public class Problem05 {
         public String longestPalindrome(String s) {
             int max = 0;
             String longest = "";
+
             for (int i = 0; i < s.length(); i++) {
                 String p = longestPalindromic(s, i);
                 if (p.length() > max) {
@@ -18,28 +19,24 @@ public class Problem05 {
         }
 
         private String longestPalindromic(String s, int pivot) {
-            int cnt = 0;
             // if pivot is not pair
+            int cnt = 0;
             for (int i = 1; i <= pivot; i++) {
-                if (pivot - i < 0 || pivot + i > s.length() - 1) {
-                    break;
-                }
-                if (s.charAt(pivot - i) != s.charAt(pivot + i)) {
+                if ((pivot - i < 0) || ((pivot + i) > (s.length() - 1)) ||
+                        (s.charAt(pivot - i) != s.charAt(pivot + i))) {
                     break;
                 }
                 cnt++;
             }
 
+            // if pivot is pair (ABBA)
             int cntPair = 0;
             boolean isPair = false;
-            // if pivot is pair (ABBA)
-            if (pivot + 1 < s.length() - 1 && s.charAt(pivot) == s.charAt(pivot + 1)) {
+            if ((pivot + 1 <= s.length() - 1) && s.charAt(pivot) == s.charAt(pivot + 1)) {
                 isPair = true;
-                for (int i = 0; i < pivot; i++) {
-                    if (pivot - i < 0 || pivot + 1 + i > s.length() - 1) {
-                        break;
-                    }
-                    if (s.charAt(pivot - i) != s.charAt(pivot + 1 + i)) {
+                for (int i = 1; i <= pivot; i++) {
+                    if ((pivot - i < 0) || ((pivot + 1 + i) > (s.length() - 1)) ||
+                            (s.charAt(pivot - i) != s.charAt(pivot + 1 + i))) {
                         break;
                     }
                     cntPair++;
@@ -47,14 +44,21 @@ public class Problem05 {
             }
 
             StringBuilder sb = new StringBuilder();
-            if (cntPair > cnt + 1 || ((cntPair == cnt + 1) && isPair)) {
-                for (int i = pivot - cntPair; i <= pivot + cntPair + 1; i++) {
-                    sb.append(s.charAt(i));
+            int from = pivot - cnt;
+            int to = pivot + cnt;
+
+            if (isPair) {
+                int _from = pivot - cntPair;
+                int _to = pivot + cntPair + 1;
+                if ((_to - from) > (to - from)) {
+                    from = _from;
+                    to = _to;
                 }
-            } else {
-                for (int i = pivot - cnt; i <= pivot + cnt; i++) {
-                    sb.append(s.charAt(i));
-                }
+            }
+
+//            System.out.printf("%s(%d), from: %c(%d)/ to: %c(%d)\n", s, pivot, s.charAt(from), from, s.charAt(to), to);
+            for (int i = from; i <= to; i++) {
+                sb.append(s.charAt(i));
             }
             return sb.toString();
         }
